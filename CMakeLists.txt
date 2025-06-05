@@ -4,6 +4,9 @@ project(MillionaireProject CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+# Add include directory
+include_directories(include)
+
 # # --- nlohmann/json ---
 # # Option 1: Add nlohmann/json directly (e.g., as a submodule or copy headers)
 # # Assuming nlohmann/json/single_include/nlohmann/json.hpp is available
@@ -24,25 +27,26 @@ FetchContent_MakeAvailable(nlohmann_json)
 
 # --- Source Files ---
 set(COMMON_SOURCES
-    player.cpp
-    question.cpp
-    leaderboard.cpp
-    question_manager.cpp
-    game.cpp
+    src/player.cpp
+    src/question.cpp
+    src/leaderboard.cpp
+    src/question_manager.cpp
+    src/game.cpp
 )
 
 set(COMMON_HEADERS
-    player.h
-    question.h
-    leaderboard.h
-    question_manager.h
-    game.h
-    colors.h
+    include/player.h
+    include/question.h
+    include/leaderboard.h
+    include/question_manager.h
+    include/game.h
+    include/colors.h
+    include/game_session.h
     # Add any other common headers, e.g., for JSON parsing utilities if you make one
 )
 
 # --- Executable 1: millionaire_game ---
-add_executable(millionaire_game main_game.cpp ${COMMON_SOURCES})
+add_executable(millionaire_game src/main_game.cpp ${COMMON_SOURCES})
 if(MSVC)
     target_compile_options(millionaire_game PRIVATE /W4)
 else()
@@ -50,7 +54,7 @@ else()
 endif()
 
 # --- Executable 2: millionaire_util ---
-add_executable(millionaire_util main_util.cpp ${COMMON_SOURCES})
+add_executable(millionaire_util src/main_util.cpp ${COMMON_SOURCES})
 if(MSVC)
     target_compile_options(millionaire_util PRIVATE /W4)
 else()
