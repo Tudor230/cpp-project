@@ -1,0 +1,35 @@
+[
+    {
+        "correct_index": 0,
+        "difficulty": "easy",
+        "options": [
+            "Paris",
+            "London",
+            "Rome",
+            "Berlin"
+        ],
+        "text": "What is the capital of France?"
+    },
+    {
+        "correct_index": 1,
+        "difficulty": "easy",
+        "options": [
+            "Mars",
+            "Jupiter",
+            "Saturn",
+            "Venus"
+        ],
+        "text": "Which is the largest planet in our solar system?"
+    },
+    {
+        "correct_index": 2,
+        "difficulty": "medium",
+        "options": [
+            "1492",
+            "1776",
+            "1066",
+            "1215"
+        ],
+        "text": "In what year was the Magna Carta signed?"
+    }
+]

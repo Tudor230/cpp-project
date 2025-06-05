@@ -1,0 +1,9 @@
+{
+    "active": false,
+    "currentQuestionIndex": 0,
+    "currentScore": 0.0,
+    "difficulty": "",
+    "playerName": "",
+    "questionsForSession": [],
+    "used5050": false
+}
