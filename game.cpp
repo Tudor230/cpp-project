@@ -1,4 +1,5 @@
 #include "game.h"
+#include "colors.h"
 #include "nlohmann/json.hpp" // For loading questions DB and session
 
 using json = nlohmann::json;
@@ -134,21 +135,24 @@ void Game::displayCurrentQuestion() const
     }
 
     const auto &q = currentSession.questionsForSession[currentSession.currentQuestionIndex];
-    std::cout << "\n------------------------------------------" << std::endl;
-    std::cout << "Player: " << currentSession.playerName << " | Score: " << currentSession.currentScore << std::endl;
-    std::cout << "Question " << (currentSession.currentQuestionIndex + 1) << "/" << currentSession.questionsForSession.size() << ": " << std::endl;
-    std::cout << q.text << std::endl;
+    std::cout << "\n"
+              << Colors::colorize("------------------------------------------", Colors::BRIGHT_CYAN) << std::endl;
+    std::cout << Colors::info("Player: ") << Colors::highlight(currentSession.playerName)
+              << Colors::info(" | Score: ") << Colors::success(std::to_string((int)currentSession.currentScore)) << std::endl;
+    std::cout << Colors::title("Question " + std::to_string(currentSession.currentQuestionIndex + 1) + "/" + std::to_string(currentSession.questionsForSession.size()) + ": ") << std::endl;
+    std::cout << Colors::colorize(q.text, Colors::BRIGHT_WHITE) << std::endl;
     for (size_t j = 0; j < q.options.size(); ++j)
     {
         if (!q.options[j].empty())
         { // Only display non-empty options (for 50/50)
-            std::cout << "  " << j << ") " << q.options[j] << std::endl;
+            std::cout << "  " << Colors::highlight(std::to_string(j) + ")") << " " << q.options[j] << std::endl;
         }
     }
-    std::cout << "------------------------------------------" << std::endl;
+    std::cout << Colors::colorize("------------------------------------------", Colors::BRIGHT_CYAN) << std::endl;
     if (!currentSession.used5050)
     {
-        std::cout << "Lifeline available: 50/50 (use './millionaire_game lifeline 5050')" << std::endl;
+        std::cout << Colors::colorize("Lifeline available: 50/50", Colors::YELLOW)
+                  << " (use " << Colors::highlight("'./millionaire_game lifeline 5050'") << ")" << std::endl;
     }
 }
 
@@ -185,12 +189,14 @@ bool Game::processAnswer(int answer_index)
 
     if (answer_index == q.correct_index)
     {
-        std::cout << "Correct!" << std::endl;
+        std::cout << Colors::success("✓ Correct!") << std::endl;
         currentSession.currentScore += 1.0f; // Or your scoring logic
     }
     else
     {
-        std::cout << "Incorrect. The correct answer was: " << q.correct_index << ") " << q.options[q.correct_index] << std::endl;
+        std::cout << Colors::error("✗ Incorrect.") << " The correct answer was: "
+                  << Colors::highlight(std::to_string(q.correct_index) + ")") << " "
+                  << Colors::colorize(q.options[q.correct_index], Colors::GREEN) << std::endl;
         // Depending on rules, game might end here. For now, we continue.
     }
 
@@ -204,8 +210,9 @@ void Game::endGame()
     if (!currentSession.active)
         return;
 
-    std::cout << "\n--- Game Over, " << currentSession.playerName << "! ---" << std::endl;
-    std::cout << "Your final score: " << currentSession.currentScore << std::endl;
+    std::cout << "\n"
+              << Colors::title("🎉 Game Over, " + currentSession.playerName + "! 🎉") << std::endl;
+    std::cout << Colors::info("Your final score: ") << Colors::success(std::to_string((int)currentSession.currentScore)) << std::endl;
 
     leaderboard.addPlayer(Player(currentSession.playerName, currentSession.currentScore));
     std::cout << "Score has been updated on the main leaderboard." << std::endl;

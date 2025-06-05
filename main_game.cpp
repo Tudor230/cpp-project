@@ -1,4 +1,5 @@
 #include "game.h" // Game.h now includes game_session.h implicitly or explicitly
+#include "colors.h"
 #include <iostream>
 #include <vector>
 #include <string>
@@ -6,13 +7,14 @@
 
 int main(int argc, char *argv[])
 {
+    Colors::initColors(); // Initialize color support
     if (argc < 2)
     {
-        std::cerr << "Usage:" << std::endl;
-        std::cerr << "  ./millionaire_game start <player_name> <difficulty>" << std::endl;
-        std::cerr << "  ./millionaire_game answer <answer_index (0-3)>" << std::endl;
-        std::cerr << "  ./millionaire_game lifeline <type (e.g., 5050)>" << std::endl;
-        std::cerr << "  ./millionaire_game instructions" << std::endl;
+        std::cerr << Colors::title("Usage:") << std::endl;
+        std::cerr << "  " << Colors::highlight("./millionaire_game start") << " <player_name> <difficulty>" << std::endl;
+        std::cerr << "  " << Colors::highlight("./millionaire_game answer") << " <answer_index (0-3)>" << std::endl;
+        std::cerr << "  " << Colors::highlight("./millionaire_game lifeline") << " <type (e.g., 5050)>" << std::endl;
+        std::cerr << "  " << Colors::highlight("./millionaire_game instructions") << std::endl;
         return 1;
     }
 
@@ -46,7 +48,7 @@ int main(int argc, char *argv[])
     {
         if (!game.currentSession.active)
         {
-            std::cout << "No active game. Use 'start' to begin a new game." << std::endl;
+            std::cout << Colors::warning("No active game. Use 'start' to begin a new game.") << std::endl;
             return 1;
         }
         if (argc != 3)
@@ -82,7 +84,7 @@ int main(int argc, char *argv[])
     {
         if (!game.currentSession.active)
         {
-            std::cout << "No active game. Use 'start' to begin a new game." << std::endl;
+            std::cout << Colors::warning("No active game. Use 'start' to begin a new game.") << std::endl;
             return 1;
         }
         if (argc != 3)

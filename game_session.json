@@ -1,9 +1,32 @@
 {
-    "active": false,
-    "currentQuestionIndex": 0,
+    "active": true,
+    "currentQuestionIndex": 1,
     "currentScore": 0.0,
-    "difficulty": "",
-    "playerName": "",
-    "questionsForSession": [],
+    "difficulty": "easy",
+    "playerName": "WrongAnswer",
+    "questionsForSession": [
+        {
+            "correct_index": 0,
+            "difficulty": "easy",
+            "options": [
+                "Paris",
+                "London",
+                "Rome",
+                "Berlin"
+            ],
+            "text": "What is the capital of France?"
+        },
+        {
+            "correct_index": 1,
+            "difficulty": "easy",
+            "options": [
+                "Mars",
+                "Jupiter",
+                "Saturn",
+                "Venus"
+            ],
+            "text": "Which is the largest planet in our solar system?"
+        }
+    ],
     "used5050": false
 }

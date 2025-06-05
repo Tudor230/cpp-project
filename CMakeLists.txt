@@ -37,6 +37,7 @@ set(COMMON_HEADERS
     leaderboard.h
     question_manager.h
     game.h
+    colors.h
     # Add any other common headers, e.g., for JSON parsing utilities if you make one
 )
 

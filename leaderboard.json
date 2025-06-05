@@ -10,5 +10,9 @@
     {
         "name": "Tudor",
         "score": 2.0
+    },
+    {
+        "name": "ColorTest",
+        "score": 2.0
     }
 ]

@@ -1,4 +1,5 @@
 #include "leaderboard.h"
+#include "colors.h"
 
 Leaderboard::Leaderboard(std::string fname) : filename(std::move(fname))
 {
@@ -80,12 +81,37 @@ void Leaderboard::show() const
         std::cout << "Leaderboard is empty." << std::endl;
         return;
     }
-    std::cout << "--- Leaderboard ---" << std::endl;
-    for (const auto &player : players)
+    std::cout << Colors::title("🏆 Leaderboard 🏆") << std::endl;
+    for (size_t i = 0; i < players.size(); ++i)
     {
-        std::cout << player.name << ": " << player.score << " points" << std::endl;
+        const auto &player = players[i];
+        std::string medal = "";
+        std::string nameColor = Colors::BRIGHT_WHITE;
+
+        if (i == 0)
+        {
+            medal = "🥇 ";
+            nameColor = Colors::BRIGHT_YELLOW;
+        }
+        else if (i == 1)
+        {
+            medal = "🥈 ";
+            nameColor = Colors::BRIGHT_WHITE;
+        }
+        else if (i == 2)
+        {
+            medal = "🥉 ";
+            nameColor = Colors::YELLOW;
+        }
+        else
+        {
+            medal = std::to_string(i + 1) + ". ";
+        }
+
+        std::cout << medal << Colors::colorize(player.name, nameColor) << ": "
+                  << Colors::success(std::to_string((int)player.score)) << " points" << std::endl;
     }
-    std::cout << "-------------------" << std::endl;
+    std::cout << Colors::colorize("-------------------", Colors::BRIGHT_CYAN) << std::endl;
 }
 
 void Leaderboard::showPlayer(const std::string &playerName) const
