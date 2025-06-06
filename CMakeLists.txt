@@ -32,6 +32,7 @@ set(COMMON_SOURCES
     src/leaderboard.cpp
     src/question_manager.cpp
     src/game.cpp
+    src/game_session.cpp
 )
 
 set(COMMON_HEADERS

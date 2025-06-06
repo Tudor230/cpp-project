@@ -31,5 +31,16 @@
             "1215"
         ],
         "text": "In what year was the Magna Carta signed?"
+    },
+    {
+        "correct_index": 0,
+        "difficulty": "easy",
+        "options": [
+            "1",
+            "2",
+            "3",
+            "4"
+        ],
+        "text": "Test"
     }
 ]

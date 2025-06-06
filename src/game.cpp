@@ -62,7 +62,7 @@ bool Game::loadSessionState()
             file >> j;
             currentSession = j.get<GameSession>();
             file.close();
-            return currentSession.active; // Return true if session is marked active
+            return currentSession.isActive(); // Return true if session is marked active
         }
         catch (json::parse_error &e)
         {
@@ -86,32 +86,35 @@ void Game::clearSessionState()
 bool Game::startNewGame(const std::string &playerName, const std::string &difficulty)
 {
     currentSession = GameSession(); // Reset any existing session
-    currentSession.playerName = playerName;
-    currentSession.difficulty = difficulty;
+    currentSession.setPlayerName(playerName);
+    currentSession.setDifficulty(difficulty);
 
+    std::vector<Question> questionsForThisSession;
     for (const auto &q : all_questions)
     {
-        if (q.difficulty == difficulty)
+        if (q.getDifficulty() == difficulty)
         {
-            currentSession.questionsForSession.push_back(q);
+            questionsForThisSession.push_back(q);
         }
     }
 
-    if (currentSession.questionsForSession.empty())
+    if (questionsForThisSession.empty())
     {
         std::cout << "No questions found for difficulty: " << difficulty << ". Cannot start game." << std::endl;
         return false;
     }
+
+    currentSession.setQuestionsForSession(questionsForThisSession);
 
     // Optional: Shuffle questions for this game session
     // std::random_device rd;
     // std::mt19937 g(rd());
     // std::shuffle(currentSession.questionsForSession.begin(), currentSession.questionsForSession.end(), g);
 
-    currentSession.active = true;
-    currentSession.currentQuestionIndex = 0;
-    currentSession.currentScore = 0.0f;
-    currentSession.used5050 = false;
+    currentSession.setActive(true);
+    currentSession.setCurrentQuestionIndex(0);
+    currentSession.setCurrentScore(0.0f);
+    currentSession.setUsed5050(false);
 
     if (saveSessionState())
     {
@@ -123,33 +126,33 @@ bool Game::startNewGame(const std::string &playerName, const std::string &diffic
 
 void Game::displayCurrentQuestion() const
 {
-    if (!currentSession.active || currentSession.questionsForSession.empty() ||
-        currentSession.currentQuestionIndex >= static_cast<int>(currentSession.questionsForSession.size()))
+    if (!currentSession.isActive() || currentSession.getQuestionsForSession().empty() ||
+        currentSession.getCurrentQuestionIndex() >= static_cast<int>(currentSession.getQuestionsForSession().size()))
     {
         std::cout << "No active question to display." << std::endl;
-        if (currentSession.active && currentSession.currentQuestionIndex >= static_cast<int>(currentSession.questionsForSession.size()))
+        if (currentSession.isActive() && currentSession.getCurrentQuestionIndex() >= static_cast<int>(currentSession.getQuestionsForSession().size()))
         {
             std::cout << "All questions answered. Game might be over." << std::endl;
         }
         return;
     }
 
-    const auto &q = currentSession.questionsForSession[currentSession.currentQuestionIndex];
+    const auto &q = currentSession.getQuestionsForSession()[currentSession.getCurrentQuestionIndex()];
     std::cout << "\n"
               << Colors::colorize("------------------------------------------", Colors::BRIGHT_CYAN) << std::endl;
-    std::cout << Colors::info("Player: ") << Colors::highlight(currentSession.playerName)
-              << Colors::info(" | Score: ") << Colors::success(std::to_string((int)currentSession.currentScore)) << std::endl;
-    std::cout << Colors::title("Question " + std::to_string(currentSession.currentQuestionIndex + 1) + "/" + std::to_string(currentSession.questionsForSession.size()) + ": ") << std::endl;
-    std::cout << Colors::colorize(q.text, Colors::BRIGHT_WHITE) << std::endl;
-    for (size_t j = 0; j < q.options.size(); ++j)
+    std::cout << Colors::info("Player: ") << Colors::highlight(currentSession.getPlayerName())
+              << Colors::info(" | Score: ") << Colors::success(std::to_string((int)currentSession.getCurrentScore())) << std::endl;
+    std::cout << Colors::title("Question " + std::to_string(currentSession.getCurrentQuestionIndex() + 1) + "/" + std::to_string(currentSession.getQuestionsForSession().size()) + ": ") << std::endl;
+    std::cout << Colors::colorize(q.getText(), Colors::BRIGHT_WHITE) << std::endl;
+    for (size_t j = 0; j < q.getOptions().size(); ++j)
     {
-        if (!q.options[j].empty())
+        if (!q.getOptions()[j].empty())
         { // Only display non-empty options (for 50/50)
-            std::cout << "  " << Colors::highlight(std::to_string(j) + ")") << " " << q.options[j] << std::endl;
+            std::cout << "  " << Colors::highlight(std::to_string(j) + ")") << " " << q.getOptions()[j] << std::endl;
         }
     }
     std::cout << Colors::colorize("------------------------------------------", Colors::BRIGHT_CYAN) << std::endl;
-    if (!currentSession.used5050)
+    if (!currentSession.hasUsed5050())
     {
         std::cout << Colors::colorize("Lifeline available: 50/50", Colors::YELLOW)
                   << " (use " << Colors::highlight("'./millionaire_game lifeline 5050'") << ")" << std::endl;
@@ -158,63 +161,63 @@ void Game::displayCurrentQuestion() const
 
 bool Game::processAnswer(int answer_index)
 {
-    if (!currentSession.active)
+    if (!currentSession.isActive())
     {
         std::cout << "No active game session. Start a new game first." << std::endl;
         return false;
     }
-    if (currentSession.currentQuestionIndex >= static_cast<int>(currentSession.questionsForSession.size()))
+    if (currentSession.getCurrentQuestionIndex() >= static_cast<int>(currentSession.getQuestionsForSession().size()))
     {
         std::cout << "All questions have been answered. Game is over." << std::endl;
         endGame();
         return false; // No more questions to process
     }
 
-    const auto &q = currentSession.questionsForSession[currentSession.currentQuestionIndex];
+    const auto &q = currentSession.getQuestionsForSession()[currentSession.getCurrentQuestionIndex()];
 
     std::cout << "\nPlayer's answer: " << answer_index;
-    if (answer_index >= 0 && answer_index < static_cast<int>(q.options.size()) && !q.options[answer_index].empty())
+    if (answer_index >= 0 && answer_index < static_cast<int>(q.getOptions().size()) && !q.getOptions()[answer_index].empty())
     {
-        std::cout << " (" << q.options[answer_index] << ")" << std::endl;
+        std::cout << " (" << q.getOptions()[answer_index] << ")" << std::endl;
     }
     else
     {
         std::cout << " (Invalid or unavailable option)" << std::endl;
         // if answer is invalid, treat as wrong
-        std::cout << "Incorrect. The correct answer was: " << q.correct_index << ") " << q.options[q.correct_index] << std::endl;
-        currentSession.currentQuestionIndex++; // Move to next question or end game
+        std::cout << "Incorrect. The correct answer was: " << q.getCorrectIndex() << ") " << q.getOptions()[q.getCorrectIndex()] << std::endl;
+        currentSession.setCurrentQuestionIndex(currentSession.getCurrentQuestionIndex() + 1); // Move to next question or end game
         saveSessionState();
         return true; // Processed, but was incorrect.
     }
 
-    if (answer_index == q.correct_index)
+    if (answer_index == q.getCorrectIndex())
     {
         std::cout << Colors::success("✓ Correct!") << std::endl;
-        currentSession.currentScore += 1.0f; // Or your scoring logic
+        currentSession.setCurrentScore(currentSession.getCurrentScore() + 1.0f); // Or your scoring logic
     }
     else
     {
         std::cout << Colors::error("✗ Incorrect.") << " The correct answer was: "
-                  << Colors::highlight(std::to_string(q.correct_index) + ")") << " "
-                  << Colors::colorize(q.options[q.correct_index], Colors::GREEN) << std::endl;
+                  << Colors::highlight(std::to_string(q.getCorrectIndex()) + ")") << " "
+                  << Colors::colorize(q.getOptions()[q.getCorrectIndex()], Colors::GREEN) << std::endl;
         // Depending on rules, game might end here. For now, we continue.
     }
 
-    currentSession.currentQuestionIndex++;
+    currentSession.setCurrentQuestionIndex(currentSession.getCurrentQuestionIndex() + 1);
     saveSessionState();
     return true;
 }
 
 void Game::endGame()
 {
-    if (!currentSession.active)
+    if (!currentSession.isActive())
         return;
 
     std::cout << "\n"
-              << Colors::title("🎉 Game Over, " + currentSession.playerName + "! 🎉") << std::endl;
-    std::cout << Colors::info("Your final score: ") << Colors::success(std::to_string((int)currentSession.currentScore)) << std::endl;
+              << Colors::title("*** Game Over, " + currentSession.getPlayerName() + "! ***") << std::endl;
+    std::cout << Colors::info("Your final score: ") << Colors::success(std::to_string((int)currentSession.getCurrentScore())) << std::endl;
 
-    leaderboard.addPlayer(Player(currentSession.playerName, currentSession.currentScore));
+    leaderboard.addPlayer(Player(currentSession.getPlayerName(), currentSession.getCurrentScore()));
     std::cout << "Score has been updated on the main leaderboard." << std::endl;
     leaderboard.show(); // Show updated leaderboard
 
@@ -223,33 +226,33 @@ void Game::endGame()
 
 bool Game::apply5050Lifeline()
 {
-    if (!currentSession.active)
+    if (!currentSession.isActive())
     {
         std::cout << "No active game to apply lifeline." << std::endl;
         return false;
     }
-    if (currentSession.used5050)
+    if (currentSession.hasUsed5050())
     {
         std::cout << "50/50 lifeline has already been used." << std::endl;
         return false;
     }
-    if (currentSession.currentQuestionIndex >= static_cast<int>(currentSession.questionsForSession.size()))
+    if (currentSession.getCurrentQuestionIndex() >= static_cast<int>(currentSession.getQuestionsForSession().size()))
     {
         std::cout << "No current question to apply lifeline to." << std::endl;
         return false;
     }
 
-    Question &current_q = currentSession.questionsForSession[currentSession.currentQuestionIndex];
-    if (current_q.options.size() < 4)
+    Question &current_q = currentSession.getQuestionsForSession()[currentSession.getCurrentQuestionIndex()];
+    if (current_q.getOptions().size() < 4)
     { // Should be 4 for 50/50 to make sense
         std::cout << "Cannot apply 50/50: Not enough options." << std::endl;
         return false;
     }
 
     std::vector<int> incorrect_options_indices;
-    for (size_t i = 0; i < current_q.options.size(); ++i)
+    for (size_t i = 0; i < current_q.getOptions().size(); ++i)
     {
-        if (static_cast<int>(i) != current_q.correct_index)
+        if (static_cast<int>(i) != current_q.getCorrectIndex())
         {
             incorrect_options_indices.push_back(i);
         }
@@ -268,10 +271,12 @@ bool Game::apply5050Lifeline()
 
     // Mark two incorrect options as empty.
     // The displayCurrentQuestion method will need to handle empty strings.
-    current_q.options[incorrect_options_indices[0]] = "";
-    current_q.options[incorrect_options_indices[1]] = "";
+    std::vector<std::string> modifiedOptions = current_q.getOptions();
+    modifiedOptions[incorrect_options_indices[0]] = "";
+    modifiedOptions[incorrect_options_indices[1]] = "";
+    current_q.setOptions(modifiedOptions);
 
-    currentSession.used5050 = true;
+    currentSession.setUsed5050(true);
     std::cout << "50/50 lifeline applied. Two incorrect options removed." << std::endl;
     saveSessionState();
     return true;

@@ -8,8 +8,9 @@
 
 using json = nlohmann::json;
 
-struct GameSession
+class GameSession
 {
+private:
     bool active = false;                       // Is a game currently in progress?
     std::string playerName;                    // Name of the current player
     std::string difficulty;                    // Difficulty of the current game
@@ -21,8 +22,34 @@ struct GameSession
     // the temporarily modified options or indices to hide.
     // For simplicity, apply5050 will modify the options in questionsForSession directly for the current question.
 
-    // For JSON serialization/deserialization
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(GameSession, active, playerName, difficulty, currentScore, currentQuestionIndex, questionsForSession, used5050);
+public:
+    // Default constructor
+    GameSession() = default;
+
+    // Getters and setters for private attributes
+    bool isActive() const { return active; }
+    void setActive(bool a) { active = a; }
+    const std::string &getPlayerName() const { return playerName; }
+    void setPlayerName(const std::string &name) { playerName = name; }
+    const std::string &getDifficulty() const { return difficulty; }
+    void setDifficulty(const std::string &diff) { difficulty = diff; }
+    float getCurrentScore() const { return currentScore; }
+    void setCurrentScore(float score) { currentScore = score; }
+    int getCurrentQuestionIndex() const { return currentQuestionIndex; }
+    void setCurrentQuestionIndex(int index) { currentQuestionIndex = index; }
+    const std::vector<Question> &getQuestionsForSession() const { return questionsForSession; }
+    std::vector<Question> &getQuestionsForSession() { return questionsForSession; }
+    void setQuestionsForSession(const std::vector<Question> &questions) { questionsForSession = questions; }
+    bool hasUsed5050() const { return used5050; }
+    void setUsed5050(bool used) { used5050 = used; }
+
+    // For JSON serialization/deserialization - friend function approach
+    friend void to_json(json &j, const GameSession &gs);
+    friend void from_json(const json &j, GameSession &gs);
 };
+
+// JSON serialization functions
+void to_json(json &j, const GameSession &gs);
+void from_json(const json &j, GameSession &gs);
 
 #endif // GAME_SESSION_H

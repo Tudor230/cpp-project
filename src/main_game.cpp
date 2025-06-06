@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
     }
     else if (command == "answer")
     {
-        if (!game.currentSession.active)
+        if (!game.getCurrentSession().isActive())
         {
             std::cout << Colors::warning("No active game. Use 'start' to begin a new game.") << std::endl;
             return 1;
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
         if (game.processAnswer(answer_idx))
         {
             // Check if game is over
-            if (game.currentSession.currentQuestionIndex >= static_cast<int>(game.currentSession.questionsForSession.size()))
+            if (game.getCurrentSession().getCurrentQuestionIndex() >= static_cast<int>(game.getCurrentSession().getQuestionsForSession().size()))
             {
                 game.endGame(); // Finalizes score, updates leaderboard, clears session
             }
@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
     }
     else if (command == "lifeline")
     {
-        if (!game.currentSession.active)
+        if (!game.getCurrentSession().isActive())
         {
             std::cout << Colors::warning("No active game. Use 'start' to begin a new game.") << std::endl;
             return 1;

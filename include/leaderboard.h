@@ -13,11 +13,16 @@ using json = nlohmann::json;
 
 class Leaderboard
 {
-public:
+private:
     std::vector<Player> players; // [cite: 1] Aggregation of Player records [cite: 19]
     std::string filename;
 
+public:
     Leaderboard(std::string fname = "leaderboard.json");
+
+    // Getters for private attributes
+    const std::vector<Player> &getPlayers() const { return players; }
+    const std::string &getFilename() const { return filename; }
 
     void loadFromFile();             // Renamed from loadFromFile(string filename) [cite: 1] for consistency
     void saveToFile();               // Renamed from saveToFile(string filename) [cite: 1]

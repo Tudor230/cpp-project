@@ -12,11 +12,16 @@ using json = nlohmann::json;
 
 class QuestionManager
 {
-public:
+private:
     std::vector<Question> questions; // [cite: 7] Composition of Question objects [cite: 18]
     std::string filename;
 
+public:
     QuestionManager(std::string fname = "questions.json");
+
+    // Getters for private attributes
+    const std::vector<Question> &getQuestions() const { return questions; }
+    const std::string &getFilename() const { return filename; }
 
     void load();       // Renamed from load(string filename) [cite: 7]
     void save() const; // Renamed from save(string filename) [cite: 7]

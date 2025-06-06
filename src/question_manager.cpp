@@ -74,12 +74,12 @@ void QuestionManager::showAllQuestions() const
     for (size_t i = 0; i < questions.size(); ++i)
     {
         const auto &q = questions[i];
-        std::cout << "Q" << i + 1 << " (" << q.difficulty << "): " << q.text << std::endl;
-        for (size_t j = 0; j < q.options.size(); ++j)
+        std::cout << "Q" << i + 1 << " (" << q.getDifficulty() << "): " << q.getText() << std::endl;
+        for (size_t j = 0; j < q.getOptions().size(); ++j)
         {
-            std::cout << "  " << char('A' + j) << ") " << q.options[j] << std::endl;
+            std::cout << "  " << char('A' + j) << ") " << q.getOptions()[j] << std::endl;
         }
-        std::cout << "  Correct: " << char('A' + q.correct_index) << std::endl;
+        std::cout << "  Correct: " << char('A' + q.getCorrectIndex()) << std::endl;
         std::cout << "---------------------" << std::endl;
     }
 }

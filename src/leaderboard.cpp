@@ -52,13 +52,13 @@ void Leaderboard::addPlayer(const Player &p)
     bool found = false;
     for (auto &player : players)
     {
-        if (player.name == p.name)
+        if (player.getName() == p.getName())
         {
             // Update score if new score is higher (or just update regardless, depending on desired logic)
             // PDF does not specify, let's update if higher.
-            if (p.score > player.score)
+            if (p.getScore() > player.getScore())
             {
-                player.score = p.score;
+                player.setScore(p.getScore());
             }
             found = true;
             break;
@@ -70,7 +70,7 @@ void Leaderboard::addPlayer(const Player &p)
     }
     // Sort players by score descending
     std::sort(players.begin(), players.end(), [](const Player &a, const Player &b)
-              { return a.score > b.score; });
+              { return a.getScore() > b.getScore(); });
     saveToFile();
 }
 
@@ -108,8 +108,8 @@ void Leaderboard::show() const
             medal = std::to_string(i + 1) + ". ";
         }
 
-        std::cout << medal << Colors::colorize(player.name, nameColor) << ": "
-                  << Colors::success(std::to_string((int)player.score)) << " points" << std::endl;
+        std::cout << medal << Colors::colorize(player.getName(), nameColor) << ": "
+                  << Colors::success(std::to_string((int)player.getScore())) << " points" << std::endl;
     }
     std::cout << Colors::colorize("-------------------", Colors::BRIGHT_CYAN) << std::endl;
 }
@@ -119,10 +119,10 @@ void Leaderboard::showPlayer(const std::string &playerName) const
     bool found = false;
     for (const auto &player : players)
     {
-        if (player.name == playerName)
+        if (player.getName() == playerName)
         {
             std::cout << "--- Player Score ---" << std::endl;
-            std::cout << player.name << ": " << player.score << " points" << std::endl;
+            std::cout << player.getName() << ": " << player.getScore() << " points" << std::endl;
             std::cout << "--------------------" << std::endl;
             found = true;
             break;
